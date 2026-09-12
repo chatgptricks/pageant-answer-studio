@@ -393,6 +393,14 @@
   .speech-line { display: block; white-space: pre-wrap; }
   .speech-line + .speech-line { margin-top: 10px; }
 </style>
+<style>
+  .manual-text { max-width: 760px; margin: 0 auto 48px; padding: 0 24px; }
+  .manual-text label { display: block; color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+  .manual-text textarea { display: block; width: 100%; min-height: 130px; padding: 16px; resize: vertical; background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 14px; font: inherit; line-height: 1.6; }
+  .manual-text textarea:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .manual-text button { margin-top: 12px; padding: 12px 22px; border: 1px solid var(--accent); border-radius: 10px; background: var(--accent); color: #04120e; font: inherit; font-weight: 700; cursor: pointer; }
+  .manual-text button:disabled { opacity: .4; cursor: default; }
+</style>
 </head>
 <body>
 <button class="timer" id="timer" hidden title="Restart timer" aria-label="Restart timer">100s ↻</button>
@@ -429,6 +437,11 @@
       <label class="speech-toggle" for="showFinalSpeeches"><input type="checkbox" id="showFinalSpeeches" aria-controls="finalSpeeches" aria-expanded="false">Show final speeches</label>
       <section class="final-speeches" id="finalSpeeches" aria-label="Final speeches" hidden></section>
     </div>
+    <section class="manual-text" aria-label="Manual text">
+      <label for="manualText">Write your own text</label>
+      <textarea id="manualText" placeholder="Type or paste anything you want to copy..." rows="4"></textarea>
+      <button id="copyManualText" type="button" disabled>Copy text</button>
+    </section>
   </main>
 </div>
 
@@ -783,6 +796,18 @@ function resetTimer() {
   timerDeadline = 0;
   document.getElementById('timer').hidden = true;
 }
+const manualTextEl = document.getElementById('manualText');
+const copyManualTextEl = document.getElementById('copyManualText');
+manualTextEl.addEventListener('input', () => {
+  copyManualTextEl.disabled = !manualTextEl.value.trim();
+});
+copyManualTextEl.addEventListener('click', async () => {
+  if (!manualTextEl.value.trim()) return;
+  try {
+    await copyText(manualTextEl.value);
+    showToast('Your text copied');
+  } catch { /* copyText reports clipboard errors */ }
+});
 document.getElementById('timer').addEventListener('click', startTimer);
 document.addEventListener('visibilitychange', () => { if (timerDeadline) updateTimer(); });
 rankResults();
