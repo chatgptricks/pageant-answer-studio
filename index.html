@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d10">
 <title>Pageant Answer Studio</title>
 <style>
   :root {
@@ -402,6 +403,64 @@
   .manual-text button:disabled { opacity: .4; cursor: default; }
 </style>
 </head>
+<style>
+  /* Color cues are accompanied by section labels */
+  .quick-lines > div:first-child { --section-color: #a9caff; --section-border: #385784; --section-bg: #121f32; }
+  .quick-lines > div:last-child { --section-color: #ffc3b1; --section-border: #805243; --section-bg: #2b1b19; }
+  .extenders { --section-color: #d5bcff; --section-border: #665084; --section-bg: #211b31; }
+  .final-speeches { --section-color: #ffe0a0; --section-border: #7c6438; --section-bg: #282217; }
+  .quick-lines h2, .extenders h2, .final-speeches h2, .final-speeches h3, .final-speeches .speech-label { color: var(--section-color); }
+  .quick-lines .phrase, .extenders .phrase, .final-speeches .phrase { background: var(--section-bg); border-color: var(--section-border); border-left: 3px solid var(--section-color); }
+  .quick-lines .phrase:hover, .extenders .phrase:hover, .final-speeches .phrase:hover { border-color: var(--section-color); }
+  .results .card { border-color: #32745e; background: #101e19; }
+  .results .card-head { border-color: #294e40; }
+  .results .num { color: #a5f2d3; background: #19362a; border-color: #32745e; }
+  .results .sentence-row + .sentence-row { border-top: 1px solid #294e40; }
+  .results .copy-btn { width: 48px; height: 48px; color: #a5f2d3; border-color: #32745e; }
+  .sentence-row { grid-template-columns: 34px minmax(0,1fr) 48px; }
+  .phrase, .question, .sentence, .speech-line { overflow-wrap: anywhere; }
+  .field, .results, .quick-lines > div { min-width: 0; }
+  button { touch-action: manipulation; }
+  .prev-btn, .next-btn { width: 48px; height: 48px; }
+  .copy-all { min-height: 44px; text-align: left; line-height: 1.4; padding-right: 12px; }
+  .phrase { min-height: 48px; }
+  .speech-toggle { min-height: 48px; }
+  .manual-text { padding-bottom: env(safe-area-inset-bottom); }
+  @media (max-width: 900px) {
+    .topbar { position: sticky; top: 0; z-index: 4; background: #0b0d10f5; padding: calc(78px + env(safe-area-inset-top)) 16px 14px; border-bottom: 1px solid var(--border); }
+    .timer { top: calc(8px + env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); font-size: 30px; padding: 8px 16px; min-width: 132px; max-width: calc(100vw - 32px); }
+    .controls { gap: 10px; }
+    .controls .input { height: 50px; font-size: 16px; padding-left: 18px; }
+    .search-icon { display: none; }
+    .clear-btn { flex: 0 0 50px; height: 50px; width: 50px; }
+    .settings { max-height: 50dvh; overflow-y: auto; }
+    .settings .input { font-size: 16px; }
+    .content { padding: 20px 16px 28px; gap: 18px 12px; }
+    .question { font-size: 23px; line-height: 1.35; }
+    .card-head { padding: 20px; }
+    .sentences { padding: 8px 12px; }
+    .sentence-row { grid-template-columns: 30px minmax(0,1fr) 48px; padding: 14px 4px; gap: 10px; }
+    .sentence { font-size: 16px; line-height: 1.6; }
+    .card-footer { flex-wrap: wrap; gap: 8px; padding: 8px 16px 18px; }
+    .nav { margin-left: auto; }
+    .quick-lines h2 { font-size: 14px; line-height: 1.5; }
+    .phrase { font-size: 16px; line-height: 1.55; padding: 14px 12px; }
+    .manual-text { padding-left: 16px; padding-right: 16px; }
+    .manual-text textarea { font-size: 16px; }
+    .manual-text button { width: 100%; min-height: 48px; }
+    .toast { bottom: calc(16px + env(safe-area-inset-bottom)); right: 16px; left: 16px; text-align: center; }
+  }
+  @media (max-width: 480px) {
+    .sentence-row { grid-template-columns: 30px minmax(0,1fr) 48px; }
+    .sentence-row .num { grid-column: 1; grid-row: 1; }
+    .sentence-row .copy-btn { grid-column: 3; grid-row: 1; }
+    .sentence-row .sentence { grid-column: 1 / -1; grid-row: 2; }
+    .card-head { padding: 18px 16px; }
+    .empty { padding: 28px 18px; }
+    .copy-all { flex-basis: 100%; }
+    .nav { width: 100%; justify-content: flex-end; }
+  }
+</style>
 <body>
 <button class="timer" id="timer" hidden title="Restart timer" aria-label="Restart timer">100s ↻</button>
 <div class="app">
