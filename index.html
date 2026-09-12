@@ -395,7 +395,7 @@
 </style>
 </head>
 <body>
-<button class="timer" id="timer" hidden title="Restart the 100 second timer" aria-label="Restart timer">100s ↻</button>
+<button class="timer" id="timer" hidden title="Restart timer" aria-label="Restart timer">100s ↻</button>
 <div class="app">
   <main>
     <div class="topbar">
@@ -411,6 +411,9 @@
         <label for="contest">Pageant name</label>
         <input class="input" id="contest" type="text" value="Miss Universe" placeholder="Miss Universe">
         <p>The pageant name is automatically replaced throughout relevant answers.</p>
+        <label for="timerDuration" style="margin-top:20px">Timer duration (seconds)</label>
+        <input class="input" id="timerDuration" type="number" min="1" max="3600" step="1" value="100" aria-describedby="timerDurationHelp">
+        <p id="timerDurationHelp">1–3600 seconds, changing this restarts a visible timer</p>
         <label style="display:flex;align-items:center;gap:10px;margin-top:20px;cursor:pointer" for="copyAllCaps">
           <input id="copyAllCaps" type="checkbox" style="width:20px;height:20px;accent-color:var(--accent)">
           Copy in ALL CAPS
@@ -438,6 +441,7 @@ const state = {
   query: "",
   contest: localStorage.getItem("pageantContest") || "Miss Universe",
   copyAllCaps: localStorage.getItem("pageantCopyAllCaps") === "true",
+  timerSeconds: readTimerSeconds(),
   ranked: [],
   activeIndex: 0
 };
@@ -447,6 +451,27 @@ const searchEl = document.getElementById("search");
 const contestEl = document.getElementById("contest");
 const toastEl = document.getElementById("toast");
 const settingsPanel = document.getElementById("settingsPanel");
+
+function readTimerSeconds() {
+  try {
+    const seconds = Number(localStorage.getItem('pageantTimerSeconds'));
+    return Number.isInteger(seconds) && seconds >= 1 && seconds <= 3600 ? seconds : 100;
+  } catch { return 100; }
+}
+const timerDurationEl = document.getElementById('timerDuration');
+timerDurationEl.value = state.timerSeconds;
+timerDurationEl.addEventListener('change', () => {
+  const seconds = Number(timerDurationEl.value);
+  if (!Number.isInteger(seconds) || seconds < 1 || seconds > 3600) {
+    timerDurationEl.value = state.timerSeconds;
+    showToast('Enter a whole number from 1 to 3600 seconds');
+    return;
+  }
+  state.timerSeconds = seconds;
+  try { localStorage.setItem('pageantTimerSeconds', String(seconds)); }
+  catch { showToast('Timer updated but the setting could not be saved'); }
+  if (!document.getElementById('timer').hidden) startTimer();
+});
 
 contestEl.value = state.contest;
 const copyAllCapsEl = document.getElementById('copyAllCaps');
@@ -748,7 +773,7 @@ function updateTimer() {
 }
 function startTimer() {
   clearInterval(timerInterval);
-  timerDeadline = Date.now() + 100000;
+  timerDeadline = Date.now() + state.timerSeconds * 1000;
   document.getElementById('timer').hidden = false;
   updateTimer();
   timerInterval = setInterval(updateTimer, 250);
