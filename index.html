@@ -467,6 +467,7 @@
   .question-bank input, .question-bank select { min-width: 0; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); color: var(--text); padding: 14px; font: inherit; font-size: 16px; }
   .question-bank input { flex: 1 1 250px; }
   .question-bank select { flex: 1 1 180px; }
+  .bank-action { min-height: 48px; padding: 12px 18px; border: 1px solid #43677a; border-radius: 12px; background: #12232b; color: #9cdeff; font: inherit; font-weight: 700; cursor: pointer; }
   .bank-count, .bank-note { color: var(--muted); font-size: 13px; line-height: 1.5; }
   .bank-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; max-height: 65vh; overflow-y: auto; padding: 4px; }
   .bank-question { margin: 0; border-left: 3px solid #9cdeff; }
@@ -516,6 +517,8 @@
         <input type="search" id="questionSearch" placeholder="Search questions..." aria-label="Search question bank">
         <select id="questionCategory" aria-label="Question category"><option value="">All categories</option></select>
         <select id="questionSource" aria-label="Question source"><option value="">All questions</option><option value="existing">Existing answers</option><option value="new">New practice questions</option></select>
+        <button class="bank-action" id="randomQuestion" type="button" title="Pick from all questions">Random</button>
+        <button class="bank-action" id="showAllQuestions" type="button" hidden>Show all</button>
       </div>
       <p class="bank-count" id="questionCount" aria-live="polite"></p>
       <div class="bank-list" id="questionList"></div>
@@ -949,12 +952,14 @@ for (const entry of [...DATA.map(e => ({question:e.question, category:e.category
 }
 const questionCategoryEl = document.getElementById('questionCategory');
 questionCategoryEl.innerHTML += [...new Set(questionBankItems.map(e=>e.category))].sort().map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+let randomQuestionItem = null;
 function renderQuestionBank() {
   const terms = normalize(document.getElementById('questionSearch').value).split(' ').filter(Boolean);
   const category = questionCategoryEl.value;
   const source = document.getElementById('questionSource').value;
-  const filtered = questionBankItems.filter(e => (!category || e.category === category) && (!source || e.source === source) && terms.every(t=>normalize(personalize(e.question)+' '+e.category).includes(t)));
-  document.getElementById('questionCount').textContent = `${filtered.length} of ${questionBankItems.length} questions · new practice questions do not include prepared answers`;
+  const filtered = randomQuestionItem ? [randomQuestionItem] : questionBankItems.filter(e => (!category || e.category === category) && (!source || e.source === source) && terms.every(t=>normalize(personalize(e.question)+' '+e.category).includes(t)));
+  document.getElementById('showAllQuestions').hidden = !randomQuestionItem;
+  document.getElementById('questionCount').textContent = randomQuestionItem ? 'Random question · click the question to copy or press Random again' : `${filtered.length} of ${questionBankItems.length} questions · new practice questions do not include prepared answers`;
   const list = document.getElementById('questionList');
   list.innerHTML = filtered.length ? filtered.map(e=>`<button class="phrase bank-question" data-question="${escapeHtml(personalize(e.question))}"><small>${escapeHtml(e.category)} · ${e.source === 'new' ? 'New practice' : 'Existing answer'} · Copy</small>${escapeHtml(personalize(e.question))}</button>`).join('') : '<p class="bank-note">No questions found, try another topic or clear the filters</p>';
   list.scrollTop = 0;
@@ -964,9 +969,19 @@ document.getElementById('questionList').addEventListener('click', async event =>
   if (!button) return;
   try { await copyText(button.dataset.question); showToast('Question copied'); } catch {}
 });
-document.getElementById('questionSearch').addEventListener('input', renderQuestionBank);
-questionCategoryEl.addEventListener('change', renderQuestionBank);
-document.getElementById('questionSource').addEventListener('change', renderQuestionBank);
+function clearRandomQuestion() { randomQuestionItem = null; renderQuestionBank(); }
+document.getElementById('randomQuestion').addEventListener('click', () => {
+  const candidates = questionBankItems.filter(item => item !== randomQuestionItem);
+  randomQuestionItem = candidates[Math.floor(Math.random() * candidates.length)];
+  document.getElementById('questionSearch').value = '';
+  questionCategoryEl.value = '';
+  document.getElementById('questionSource').value = '';
+  renderQuestionBank();
+});
+document.getElementById('showAllQuestions').addEventListener('click', clearRandomQuestion);
+document.getElementById('questionSearch').addEventListener('input', clearRandomQuestion);
+questionCategoryEl.addEventListener('change', clearRandomQuestion);
+document.getElementById('questionSource').addEventListener('change', clearRandomQuestion);
 contestEl.addEventListener('input', renderQuestionBank);
 renderQuestionBank();
 const manualTextEl = document.getElementById('manualText');
