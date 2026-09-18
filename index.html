@@ -460,6 +460,19 @@
     .nav { width: 100%; justify-content: flex-end; }
   }
 </style>
+<style>
+  .question-bank { max-width: 1100px; margin: 0 auto 32px; padding: 0 16px; }
+  .question-bank summary { padding: 18px; border: 1px solid #43677a; border-radius: 14px; background: #12232b; color: #9cdeff; cursor: pointer; font-weight: 700; }
+  .question-bank .bank-tools { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
+  .question-bank input, .question-bank select { min-width: 0; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); color: var(--text); padding: 14px; font: inherit; font-size: 16px; }
+  .question-bank input { flex: 1 1 250px; }
+  .question-bank select { flex: 1 1 180px; }
+  .bank-count, .bank-note { color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .bank-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; max-height: 65vh; overflow-y: auto; padding: 4px; }
+  .bank-question { margin: 0; border-left: 3px solid #9cdeff; }
+  .bank-question small { display: block; color: #9cdeff; margin-bottom: 8px; font-size: 12px; }
+  @media(max-width: 620px) { .bank-list { grid-template-columns: minmax(0,1fr); } }
+</style>
 </head>
 <body>
 <button class="timer" id="timer" hidden title="Restart timer" aria-label="Restart timer">100s ↻</button>
@@ -496,6 +509,17 @@
       <label class="speech-toggle" for="showFinalSpeeches"><input type="checkbox" id="showFinalSpeeches" aria-controls="finalSpeeches" aria-expanded="false">Show final speeches</label>
       <section class="final-speeches" id="finalSpeeches" aria-label="Final speeches" hidden></section>
     </div>
+    <details class="question-bank" id="questionBank">
+      <summary>Question bank · browse and copy</summary>
+      <p class="bank-note">All existing questions plus new practice questions, click any question to copy it</p>
+      <div class="bank-tools">
+        <input type="search" id="questionSearch" placeholder="Search questions..." aria-label="Search question bank">
+        <select id="questionCategory" aria-label="Question category"><option value="">All categories</option></select>
+        <select id="questionSource" aria-label="Question source"><option value="">All questions</option><option value="existing">Existing answers</option><option value="new">New practice questions</option></select>
+      </div>
+      <p class="bank-count" id="questionCount" aria-live="polite"></p>
+      <div class="bank-list" id="questionList"></div>
+    </details>
     <section class="manual-text" aria-label="Manual text">
       <label for="manualText">Write your own text</label>
       <textarea id="manualText" placeholder="Type or paste anything you want to copy..." rows="4"></textarea>
@@ -855,6 +879,96 @@ function resetTimer() {
   timerDeadline = 0;
   document.getElementById('timer').hidden = true;
 }
+const EXTRA_QUESTIONS = [
+  ['Personal Growth', 'What would you try if you knew nobody would judge you?'],
+  ['Personal Growth', 'How do you keep going when your effort is not being recognized?'],
+  ['Personal Growth', 'When should you stop trying and choose a different path?'],
+  ['Personal Growth', 'What is something you are still learning to accept about yourself?'],
+  ['Personal Growth', 'How do you know when confidence has become arrogance?'],
+  ['Personal Growth', 'What would you do if you disappointed someone who believed in you?'],
+  ['Personal Growth', 'Can you be ambitious and content with your life at the same time?'],
+  ['Personal Growth', 'What does starting over mean to you?'],
+  ['Personal Growth', 'How do you handle being compared with someone else?'],
+  ['Personal Growth', 'What promise would you like to make to yourself tonight?'],
+  ['Pageant Classics', 'How would you respond if you did not win tonight?'],
+  ['Pageant Classics', 'What would you say to a contestant who feels she does not belong here?'],
+  ['Pageant Classics', 'How would you stay approachable after winning Miss Universe?'],
+  ['Pageant Classics', 'What responsibility comes with being a favorite to win?'],
+  ['Pageant Classics', 'How would you support another contestant while competing for the same crown?'],
+  ['Pageant Classics', 'What would you do if the judges misunderstood your answer?'],
+  ['Pageant Classics', 'What should a titleholder do when she makes a public mistake?'],
+  ['Pageant Classics', 'How would you handle criticism of the pageant you represent?'],
+  ['Pageant Classics', 'What would you want people to remember after your reign ends?'],
+  ['Pageant Classics', 'What does representing Singapore mean to you?'],
+  ['Pageant Classics', 'How would you measure whether your year as Miss Universe was useful?'],
+  ['Pageant Classics', 'What would you change about the way pageants judge contestants?'],
+  ['Leadership & Values', 'Would you rather be respected or liked and why?'],
+  ['Leadership & Values', 'What would you do if helping someone put your own goal at risk?'],
+  ['Leadership & Values', 'How should a leader respond when the team disagrees with her?'],
+  ['Leadership & Values', 'When is staying silent the wrong choice?'],
+  ['Leadership & Values', 'Can a good intention excuse a harmful result?'],
+  ['Leadership & Values', 'How do you decide what is right when people you respect disagree?'],
+  ['Leadership & Values', 'What is the difference between being generous and trying to please everyone?'],
+  ['Leadership & Values', 'How can someone earn back trust after breaking a promise?'],
+  ['Society & Equality', 'What does equal opportunity look like for people with disabilities?'],
+  ['Society & Equality', 'How can we help older people feel included in a changing world?'],
+  ['Society & Equality', 'What should we do when a tradition causes harm?'],
+  ['Society & Equality', 'How can women support each other without expecting everyone to make the same choices?'],
+  ['Society & Equality', 'What is one unfair expectation placed on men that society should question?'],
+  ['Society & Equality', 'How should we respond when someone makes a prejudiced comment in our own community?'],
+  ['Society & Equality', 'Is treating everyone the same always fair?'],
+  ['Society & Equality', 'What can one person do when a problem feels too large to solve?'],
+  ['Technology & Media', 'Should people disclose when they use AI to create something?'],
+  ['Technology & Media', 'How should we respond to a fake video that damages someone’s reputation?'],
+  ['Technology & Media', 'What do influencers owe the people who trust them?'],
+  ['Technology & Media', 'Should children have access to social media?'],
+  ['Technology & Media', 'How can we disagree online without making the conversation cruel?'],
+  ['Technology & Media', 'What should never be replaced by technology?'],
+  ['World & Environment', 'How can countries work together when their interests are different?'],
+  ['World & Environment', 'Who should carry the greatest responsibility for protecting the environment?'],
+  ['World & Environment', 'How should we help people whose homes become unsafe because of climate change?'],
+  ['World & Environment', 'What does responsible tourism mean to you?'],
+  ['Education & Youth', 'What should schools teach that is often left out of the classroom?'],
+  ['Education & Youth', 'How can we help students who are afraid to ask questions?'],
+  ['Education & Youth', 'Should school success be measured mainly by exam results?'],
+  ['Education & Youth', 'How can young people learn from older generations while still challenging old ideas?'],
+  ['Relationships & Community', 'How do you help a friend without taking over their decisions?'],
+  ['Relationships & Community', 'What would you do if a close friend treated someone else unfairly?'],
+  ['Relationships & Community', 'How can a community make newcomers feel welcome?'],
+  ['Relationships & Community', 'When is it necessary to set a boundary with someone you care about?'],
+  ['Purpose & Future', 'What would you work toward if there were no title or award at the end?'],
+  ['Purpose & Future', 'How do you turn a good idea into something people can actually use?'],
+  ['Purpose & Future', 'What are you willing to change your mind about?'],
+  ['Purpose & Future', 'What would you say to someone who thinks it is too late to try?']
+];
+const questionBankItems = [];
+const seenQuestions = new Set();
+for (const entry of [...DATA.map(e => ({question:e.question, category:e.category, source:'existing'})), ...EXTRA_QUESTIONS.map(([category,question]) => ({category,question,source:'new'}))]) {
+  const key = normalize(entry.question);
+  if (!seenQuestions.has(key)) { seenQuestions.add(key); questionBankItems.push(entry); }
+}
+const questionCategoryEl = document.getElementById('questionCategory');
+questionCategoryEl.innerHTML += [...new Set(questionBankItems.map(e=>e.category))].sort().map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+function renderQuestionBank() {
+  const terms = normalize(document.getElementById('questionSearch').value).split(' ').filter(Boolean);
+  const category = questionCategoryEl.value;
+  const source = document.getElementById('questionSource').value;
+  const filtered = questionBankItems.filter(e => (!category || e.category === category) && (!source || e.source === source) && terms.every(t=>normalize(personalize(e.question)+' '+e.category).includes(t)));
+  document.getElementById('questionCount').textContent = `${filtered.length} of ${questionBankItems.length} questions · new practice questions do not include prepared answers`;
+  const list = document.getElementById('questionList');
+  list.innerHTML = filtered.length ? filtered.map(e=>`<button class="phrase bank-question" data-question="${escapeHtml(personalize(e.question))}"><small>${escapeHtml(e.category)} · ${e.source === 'new' ? 'New practice' : 'Existing answer'} · Copy</small>${escapeHtml(personalize(e.question))}</button>`).join('') : '<p class="bank-note">No questions found, try another topic or clear the filters</p>';
+  list.scrollTop = 0;
+}
+document.getElementById('questionList').addEventListener('click', async event => {
+  const button = event.target.closest('[data-question]');
+  if (!button) return;
+  try { await copyText(button.dataset.question); showToast('Question copied'); } catch {}
+});
+document.getElementById('questionSearch').addEventListener('input', renderQuestionBank);
+questionCategoryEl.addEventListener('change', renderQuestionBank);
+document.getElementById('questionSource').addEventListener('change', renderQuestionBank);
+contestEl.addEventListener('input', renderQuestionBank);
+renderQuestionBank();
 const manualTextEl = document.getElementById('manualText');
 const copyManualTextEl = document.getElementById('copyManualText');
 manualTextEl.addEventListener('input', () => {
