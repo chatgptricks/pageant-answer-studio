@@ -1,0 +1,33 @@
+body { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+.bottom-nav { position: fixed; z-index: 10; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); background: #11151afa; border-top: 1px solid #34404c; backdrop-filter: blur(16px); }
+.bottom-nav a { flex: 1; max-width: 160px; min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: #aab4c1; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.bottom-nav a span { font-size: 20px; line-height: 1; }
+.bottom-nav a[aria-current="page"] { background: #203028; color: #a5f2d3; }
+.bottom-nav a[href="#intro"][aria-current] { background: #182940; color: #a9caff; }
+.bottom-nav a[href="#questions"][aria-current] { background: #122b35; color: #9cdeff; }
+.bottom-nav a[href="#speech"][aria-current] { background: #30291b; color: #ffe0a0; }
+.bottom-nav a[href="#outro"][aria-current] { background: #32221d; color: #ffc3b1; }
+.bottom-nav a:focus-visible { outline: 2px solid #a5f2d3; outline-offset: -2px; }
+.screen-title { margin: 0; font-size: 23px; flex: 1; }
+body .content { display: block; max-width: 808px; margin: 0 auto; }
+body .content > * { margin-top: 20px; }
+body .quick-lines > div { margin: 0; }
+body .quick-lines > div h2 { font-size: 20px; }
+body .speech-toggle { display: none; }
+body:not([data-view="answers"]) .controls .field,
+body:not([data-view="answers"]) .search-icon,
+body:not([data-view="answers"]) #results,
+body:not([data-view="answers"]) .manual-text,
+body:not([data-view="answers"]) #extenders,
+body:not([data-view="questions"]) #questionBank,
+body:not([data-view="speech"]) #finalSpeeches,
+body:not([data-view="intro"]) .quick-lines > div:first-child,
+body:not([data-view="outro"]) .quick-lines > div:last-child,
+body[data-view="answers"] .screen-title { display: none; }
+body[data-view="questions"] .content { display: none; }
+body[data-view="questions"] #questionBank { margin-top: 24px; max-width: 808px; }
+body[data-view="questions"] #questionBank summary { display: none; }
+.bank-list { max-height: none; }
+.toast { bottom: calc(92px + env(safe-area-inset-bottom)); }
+.install-button { margin-top: 16px; padding: 12px 18px; border-radius: 10px; border: 1px solid #32745e; color: #a5f2d3; background: #19362a; font: inherit; cursor: pointer; }
+@media(max-width: 480px) { .bottom-nav a { font-size: 11px; } .screen-title { font-size: 21px; } }
