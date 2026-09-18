@@ -1,8 +1,8 @@
-const CACHE = 'pageant-studio-v1';
+const CACHE = 'pageant-studio-v2';
 const ROOT = new URL('./', self.location).href;
 const ASSETS = ['./', './index.html', './app.css', './app.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', event => {
   event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('pageant-studio-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
