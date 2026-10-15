@@ -12,7 +12,7 @@ for(const file of ['index.html','es.html']){
  assert.equal(w.eval('state.copyAllCaps'),true);
  const toggle=d.querySelector('.language-toggle');
  assert.equal(toggle.nextElementSibling.id,'settingsButton');
- assert.equal(toggle.textContent,'ES/ENG');
+ assert.equal(toggle.textContent,'🇺🇸🇪🇸');
  assert.equal(new URL(toggle.href).pathname,file==='es.html'?'/index.html':'/es.html');
  for(const e of data){
   assert.equal(data.filter(x=>x.topicId===e.topicId).length,2);

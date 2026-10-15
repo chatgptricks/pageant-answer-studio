@@ -478,7 +478,7 @@
 <link rel="apple-touch-icon" href="./icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="./app.css?v=5">
+<link rel="stylesheet" href="./app.css?v=6">
 </head>
 <body>
 <button class="timer" id="timer" hidden title="Restart timer" aria-label="Restart timer">100s ↻</button>
@@ -492,7 +492,7 @@
           <label for="search">Search question, topic, keyword or answer</label>
           <input class="input" id="search" type="text" placeholder="Search any topic: war, confidence, education..." autocomplete="off">
         </div>
-        <a class="language-toggle" href="./es.html" aria-label="Cambiar a español" title="Cambiar a español"><span>ES</span><span aria-hidden="true">/</span><span class="active-language">ENG</span></a>
+        <a class="language-toggle" href="./es.html" aria-label="Cambiar a español" title="Cambiar a español"><span class="active-language" aria-hidden="true">🇺🇸</span><span aria-hidden="true">🇪🇸</span></a>
         <button class="clear-btn" id="settingsButton" aria-label="Settings" title="Settings">⚙</button>
       </div>
       <div class="settings" id="settingsPanel">
@@ -1320,6 +1320,6 @@ document.addEventListener('visibilitychange', () => { if (timerDeadline) updateT
 rankResults();
 renderResults();
 </script>
-<script src="./app.js?v=5"></script>
+<script src="./app.js?v=6"></script>
 </body>
 </html>

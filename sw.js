@@ -1,6 +1,6 @@
-const CACHE = 'pageant-studio-v5-language-pill';
+const CACHE = 'pageant-studio-v6-language-flags';
 const ROOT = new URL('./', self.location).href;
-const ASSETS = ['./', './index.html', './es.html', './app.css?v=5', './app.js?v=5', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const ASSETS = ['./', './index.html', './es.html', './app.css?v=6', './app.js?v=6', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
