@@ -1,6 +1,11 @@
 html { min-height: 100%; height: auto; overflow-y: auto; scroll-padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
 body { min-height: 100dvh; height: auto; overflow-y: visible; padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
 main { overflow: visible; }
+.language-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 3px; flex: 0 0 auto; min-height: 48px; padding: 0 10px; border: 1px solid var(--border); border-radius: 14px; color: var(--muted); background: var(--panel); font-size: 12px; text-decoration: none; white-space: nowrap; }
+.language-toggle .active-language { color: var(--text); font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
+.language-toggle:hover { background: var(--panel-2); }
+.language-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.controls .field { min-width: 0; }
 .bank-entry { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .bank-entry .bank-question { flex: 1; }
 .bank-entry .bank-action { width: 100%; }

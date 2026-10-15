@@ -51,6 +51,7 @@ function humanize(sentences,id){
  const ui=require('./spanish-ui.json');
  for(const [en,es] of Object.entries(ui).sort((a,b)=>b[0].length-a[0].length))output=output.split(en).join(es);
  const extras=require('./spanish-extras.json');
+ output=output.replace('<a class="language-toggle" href="./es.html" aria-label="Cambiar a español" title="Cambiar a español"><span>ES</span><span aria-hidden="true">/</span><span class="active-language">ENG</span></a>', '<a class="language-toggle" href="./index.html" aria-label="Switch to English" title="Switch to English"><span class="active-language">ES</span><span aria-hidden="true">/</span><span>ENG</span></a>');
  extras.FINAL_SPEECHES=extras.FINAL_SPEECHES.map((s,i)=>({...s,sentences:require('./refine-spanish.cjs').humanize(s.sentences,i)}));
  for(const [key,value] of Object.entries(extras))output=output.replace(new RegExp('const '+key+' = .*;'),'const '+key+' = '+JSON.stringify(value)+';');
  process.stdout.write('*** Begin Patch\n*** Add File: '+process.cwd()+'/es.html\n'+output.split('\n').map(l=>'+'+l).join('\n')+'\n*** End Patch');

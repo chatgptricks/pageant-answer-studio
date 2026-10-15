@@ -1,7 +1,7 @@
 (() => {
   const spanish = document.documentElement.lang === 'es';
   const titles = spanish ? { intro:'Intro', answers:'Respuestas', questions:'Preguntas', speech:'Discurso', outro:'Cierre' } : { intro:'Intro', answers:'Answers', questions:'Questions', speech:'Speech', outro:'Outro' };
-  document.querySelectorAll('.language-switch a').forEach(link => {
+  document.querySelectorAll('.language-switch a, .language-toggle').forEach(link => {
     link.hash = location.hash;
     if (link.lang === document.documentElement.lang) link.setAttribute('aria-current', 'true');
     link.addEventListener('click', () => { link.hash = location.hash; });

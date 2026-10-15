@@ -1,4 +1,4 @@
-const CACHE = 'pageant-studio-v3-es';
+const CACHE = 'pageant-studio-v4-language-toggle';
 const ROOT = new URL('./', self.location).href;
 const ASSETS = ['./', './index.html', './es.html', './app.css', './app.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', event => {

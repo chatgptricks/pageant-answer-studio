@@ -10,6 +10,10 @@ for(const file of ['index.html','es.html']){
  assert.equal(data.length,316);assert.equal(w.eval('questionBankItems.length'),158);
  assert.equal(w.eval('OPENINGS.length'),12);assert.equal(w.eval('CLOSINGS.length'),12);assert.equal(w.eval('FINAL_SPEECHES.length'),10);
  assert.equal(w.eval('state.copyAllCaps'),true);
+ const toggle=d.querySelector('.language-toggle');
+ assert.equal(toggle.nextElementSibling.id,'settingsButton');
+ assert.equal(toggle.textContent,'ES/ENG');
+ assert.equal(new URL(toggle.href).pathname,file==='es.html'?'/index.html':'/es.html');
  for(const e of data){
   assert.equal(data.filter(x=>x.topicId===e.topicId).length,2);
   assert.equal(e.sentences.length,3);
