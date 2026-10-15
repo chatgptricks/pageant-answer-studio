@@ -1,6 +1,6 @@
-const CACHE = 'pageant-studio-v2';
+const CACHE = 'pageant-studio-v3-es';
 const ROOT = new URL('./', self.location).href;
-const ASSETS = ['./', './index.html', './app.css', './app.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const ASSETS = ['./', './index.html', './es.html', './app.css', './app.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
@@ -11,10 +11,11 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET' || !url.href.startsWith(ROOT)) return;
   if (event.request.mode === 'navigate') {
+    const page = url.pathname.endsWith('/es.html') ? './es.html' : './index.html';
     event.respondWith(fetch(event.request).then(response => {
-      if (response.ok) return caches.open(CACHE).then(async cache => { await cache.put(new URL('./index.html', ROOT).href, response.clone()); return response; });
-      return caches.match(new URL('./index.html', ROOT).href).then(cached => cached || response);
-    }).catch(() => caches.match(new URL('./index.html', ROOT).href)));
+      if (response.ok) return caches.open(CACHE).then(async cache => { await cache.put(new URL(page, ROOT).href, response.clone()); return response; });
+      return caches.match(new URL(page, ROOT).href).then(cached => cached || response);
+    }).catch(() => caches.match(new URL(page, ROOT).href)));
     return;
   }
   event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));

@@ -1,5 +1,11 @@
 (() => {
-  const titles = { intro:'Intro', answers:'Answers', questions:'Questions', speech:'Speech', outro:'Outro' };
+  const spanish = document.documentElement.lang === 'es';
+  const titles = spanish ? { intro:'Intro', answers:'Respuestas', questions:'Preguntas', speech:'Discurso', outro:'Cierre' } : { intro:'Intro', answers:'Answers', questions:'Questions', speech:'Speech', outro:'Outro' };
+  document.querySelectorAll('.language-switch a').forEach(link => {
+    link.hash = location.hash;
+    if (link.lang === document.documentElement.lang) link.setAttribute('aria-current', 'true');
+    link.addEventListener('click', () => { link.hash = location.hash; });
+  });
   function navigate() {
     const requested = location.hash.slice(1);
     const view = Object.hasOwn(titles, requested) ? requested : 'answers';
@@ -31,9 +37,9 @@
   window.addEventListener('appinstalled', () => { install.hidden = true; });
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('./sw.js').then(() => navigator.serviceWorker.ready).then(() => {
-      document.getElementById('offlineStatus').textContent = 'Ready for offline use on this device';
+      document.getElementById('offlineStatus').textContent = spanish ? 'Lista para usar sin conexión en este dispositivo' : 'Ready for offline use on this device';
     }).catch(() => {
-      document.getElementById('offlineStatus').textContent = 'Offline setup unavailable, use this page while connected';
+      document.getElementById('offlineStatus').textContent = spanish ? 'No se pudo activar el modo sin conexión, usa esta página con internet' : 'Offline setup unavailable, use this page while connected';
     });
   }
 })();
