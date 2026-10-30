@@ -478,7 +478,7 @@
 <link rel="apple-touch-icon" href="./icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="./app.css?v=7">
+<link rel="stylesheet" href="./app.css?v=8">
 </head>
 <body>
 <button class="timer" id="timer" hidden title="Restart timer" aria-label="Restart timer">100s ↻</button>
@@ -538,14 +538,15 @@
         <h2 id="manualLibraryHeading">My library</h2>
         <button class="bank-action" id="addManualEntry" type="button" aria-controls="manualEntryForm" aria-expanded="false">Add answer or script</button>
       </div>
-      <p class="bank-note">Saved in this browser on this device. Copying preserves the exact body without the title, including its original case.</p>
+      <p class="bank-note">Saved in this browser on this device. Click each block to copy its text without the title, preserving its original case.</p>
       <form id="manualEntryForm" class="manual-entry-form" hidden>
         <label for="manualEntryType">Type</label>
         <select id="manualEntryType" name="type"><option value="answer">Answer</option><option value="script">Script</option></select>
         <label for="manualEntryTitle">Title</label>
         <input id="manualEntryTitle" name="title" type="text" required>
         <label for="manualEntryBody">Body</label>
-        <textarea id="manualEntryBody" name="body" rows="8" required></textarea>
+        <textarea id="manualEntryBody" name="body" rows="8" aria-describedby="manualEntryBodyHelp" required></textarea>
+        <p class="bank-note" id="manualEntryBodyHelp">Use blank lines between paragraphs; without blank lines, each line becomes a block.</p>
         <div class="manual-entry-actions">
           <button class="bank-action" id="saveManualEntry" type="submit">Save entry</button>
           <button class="bank-action" id="cancelManualEntry" type="button">Cancel</button>
@@ -1346,7 +1347,7 @@ document.addEventListener('visibilitychange', () => { if (timerDeadline) updateT
 rankResults();
 renderResults();
 </script>
-<script src="./app.js?v=7"></script>
-<script src="./library.js?v=7"></script>
+<script src="./app.js?v=8"></script>
+<script src="./library.js?v=8"></script>
 </body>
 </html>

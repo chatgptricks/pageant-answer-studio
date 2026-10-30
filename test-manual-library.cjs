@@ -88,7 +88,9 @@ function input(app, id, value) {
 function articles(app) {
   return [...app.d.querySelectorAll('#manualEntryList article[data-entry-type]')];
 }
-function bodyOf(article) { return article.querySelector('.manual-entry-body').textContent; }
+function blocksOf(article) { return [...article.querySelectorAll('.manual-entry-body .speech-line')].map(line => line.textContent); }
+function bodyOf(article) { return blocksOf(article).join('\n\n'); }
+function findByTitle(app, title) { return articles(app).find(article => article.querySelector('h3').textContent === title); }
 function findByBody(app, body) { return articles(app).find(article => bodyOf(article) === body); }
 function openEditor(app) {
   app.d.getElementById('addManualEntry').click();
@@ -103,11 +105,37 @@ function draft(app, entry) {
 function submit(app) {
   app.d.getElementById('manualEntryForm').dispatchEvent(new app.w.Event('submit', { bubbles: true, cancelable: true }));
 }
-async function copyArticle(app, article, expected) {
+async function copyBlocks(app, article, expectedBlocks) {
   assert(article, 'Entry is visible');
-  article.querySelector('[data-copy-entry]').click();
-  await settle();
-  assert.equal(app.copied.at(-1), expected, 'Clipboard receives the complete original body only');
+  const buttons = [...article.querySelectorAll('[data-copy-entry][data-copy-block]')];
+  assert.equal(buttons.length, expectedBlocks.length, 'One copy button per nonempty block');
+  assert.deepEqual(blocksOf(article), expectedBlocks, 'Every displayed block preserves the authored text');
+  assert.equal(article.querySelectorAll('button').length, buttons.length, 'There is no extra full-body copy button');
+  const spanish = app.d.documentElement.lang === 'es';
+  for (const [index, button] of buttons.entries()) {
+    assert(button.classList.contains('phrase') && button.classList.contains('manual-entry-block'), 'Blocks follow the existing speech button pattern');
+    assert.equal(button.querySelector('.speech-label').textContent, `${spanish ? 'Parte' : 'Part'} ${index + 1} · ${spanish ? 'Copiar' : 'Copy'}`);
+    assert(button.getAttribute('aria-label'), 'Each block has an accessible copy label');
+    // Repeat after completion: a second click must copy the same block again.
+    for (let repeat = 0; repeat < 2; repeat++) {
+      const before = app.copied.length;
+      button.click();
+      await settle();
+      assert.equal(app.copied.length, before + 1, 'Each completed click writes to the clipboard once');
+      assert.equal(app.copied.at(-1), expectedBlocks[index], 'Clipboard receives only the exact block, without title, number or copy label');
+      assert.equal(button.disabled, false, 'Button remains usable after copying');
+    }
+  }
+  if (buttons.length > 1) {
+    const before = app.copied.length;
+    buttons[0].click();
+    buttons[1].click();
+    await settle();
+    assert.deepEqual(app.copied.slice(before), expectedBlocks.slice(0, 2), 'Rapid clicks on different blocks copy their own text in order');
+  }
+}
+async function copyArticle(app, article, expected) {
+  await copyBlocks(app, article, expected.split('\n\n'));
 }
 
 function verifySpanishLibraryMarkup() {
@@ -210,6 +238,33 @@ function verifySpanishLibraryMarkup() {
     await copyArticle(app, unsafeArticle, unsafe.body);
     app.close();
 
+    // Legacy multiline entries are rendered as blocks without migrating or rewriting their raw bodies.
+    const legacy = [
+      { id: 'legacy-paragraphs', type: 'script', title: 'Legacy paragraphs', body: 'First line\r\nSecond line\r\n \t\r\n  Last paragraph, Angel Muse Lane!  ' },
+      { id: 'legacy-lines', type: 'answer', title: 'Legacy lines', body: 'Line one\r\nLine two\rLine three' },
+      { id: 'legacy-blank-lines', type: 'script', title: 'Legacy blank lines', body: '\n\n  A spaced paragraph.  \n\n \t\n\nLast paragraph.\n\n' }
+    ];
+    const legacyValue = JSON.stringify(legacy);
+    const legacyBlocks = [
+      ['First line\r\nSecond line', '  Last paragraph, Angel Muse Lane!  '],
+      ['Line one', 'Line two', 'Line three'],
+      ['  A spaced paragraph.  ', 'Last paragraph.']
+    ];
+    app = await boot(file, { storage: { [key]: legacyValue } });
+    for (const [index, entry] of legacy.entries()) {
+      await copyBlocks(app, findByTitle(app, entry.title), legacyBlocks[index]);
+    }
+    assert.equal(app.w.localStorage.getItem(key), legacyValue, 'Rendering and block copying never rewrite existing raw multiline entries');
+    assert.equal(app.writes.filter(([name]) => name === key).length, 0, 'Existing entries require no migration or storage writes');
+    const legacySnapshot = app.snapshot();
+    app.close();
+    app = await boot(file, { storage: legacySnapshot });
+    for (const [index, entry] of legacy.entries()) {
+      await copyBlocks(app, findByTitle(app, entry.title), legacyBlocks[index]);
+    }
+    assert.equal(app.w.localStorage.getItem(key), legacyValue, 'Raw multiline content survives reload unchanged');
+    app.close();
+
     const existing = { id: 'existing-user-entry', type: 'answer', title: 'Previously saved', body: 'Keep this existing answer.' };
     const duplicate = { id: 'existing-opening', type: 'script', title: 'Opening copy', body: expectedScripts[0].body };
     const original = JSON.stringify([existing, duplicate]);
@@ -270,6 +325,6 @@ function verifySpanishLibraryMarkup() {
     assert.equal(app.writes.filter(([name]) => name === key).length, 0, 'Unreadable storage is not replaced');
     assert(app.d.getElementById('manualEntryStatus').textContent.trim(), 'Unavailable storage has visible feedback');
     app.close();
-    console.log(`${file}: manual library, exact clipboard, save/reload, cancellation, repeated/duplicate saves, safe rendering, storage events, filters, and storage failure checks passed`);
+    console.log(`${file}: manual library, exact per-block clipboard, repeated/rapid clicks, legacy multiline preservation, save/reload, cancellation, duplicate saves, safe rendering, storage events, filters, and storage failure checks passed`);
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });

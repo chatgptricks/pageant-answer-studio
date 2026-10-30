@@ -78,7 +78,7 @@
 "Setting applies now but could not be saved":"El ajuste se aplica ahora pero no se pudo guardar",
 "My library":"Mi biblioteca",
 "Add answer or script":"Agregar respuesta o script",
-"Saved in this browser on this device. Copying preserves the exact body without the title, including its original case.":"Se guarda en este navegador y dispositivo. Al copiar se conserva el texto exacto sin el título, incluidas sus mayúsculas y minúsculas originales.",
+"Saved in this browser on this device. Click each block to copy its text without the title, preserving its original case.":"Se guarda en este navegador y dispositivo. Pulsa cada bloque para copiar su texto sin el título y conservar sus mayúsculas y minúsculas originales.",
 ">Type</label>":">Tipo</label>",
 ">Answer</option>":">Respuesta</option>",
 ">Title</label>":">Título</label>",
@@ -89,5 +89,6 @@
 "Search my library":"Buscar en mi biblioteca",
 "Filter by type":"Filtrar por tipo",
 "All types":"Todos los tipos",
-"</span>Library":"</span>Biblioteca"
+"</span>Library":"</span>Biblioteca",
+"Use blank lines between paragraphs; without blank lines, each line becomes a block.":"Separa los párrafos con una línea en blanco; sin líneas en blanco, cada línea será un bloque."
 }

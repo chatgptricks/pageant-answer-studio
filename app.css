@@ -66,7 +66,8 @@ body[data-view="library"] .content { display: none; }
 .manual-library-tools select { flex: 1 1 140px; }
 .manual-entry { padding: 20px; margin-bottom: 20px; }
 .manual-entry-kind { color: var(--muted); font-size: 13px; }
-.manual-entry-body { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; margin: 0 0 20px; }
+.manual-entry-body { margin: 0; }
+.manual-entry-block { margin: 12px 0 0; font: inherit; line-height: 1.7; overflow-wrap: anywhere; }
 .manual-entry button { min-height: 48px; }
 .manual-library button { text-transform: none; }
 .manual-library button:disabled { opacity: .5; cursor: default; }

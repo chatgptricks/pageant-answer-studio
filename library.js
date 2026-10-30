@@ -1,21 +1,21 @@
 (() => {
   const spanish = document.documentElement.lang === 'es';
   const labels = spanish ? {
-    answer: 'Respuesta', script: 'Script', copy: 'Copiar texto completo',
+    answer: 'Respuesta', script: 'Script', part: 'Parte', copy: 'Copiar',
     empty: 'No hay textos que coincidan con tu búsqueda.',
     saved: 'Texto guardado en este navegador.', duplicate: 'Este texto ya está en tu biblioteca.',
     invalid: 'Elige un tipo e ingresa un título y un texto.',
     unavailable: 'No se pudo leer la biblioteca guardada. No se harán cambios. Revisa el almacenamiento del navegador e inténtalo de nuevo.',
     failed: 'No se pudo guardar el texto. Tu borrador sigue aquí. Revisa el espacio disponible e inténtalo de nuevo.',
-    copied: 'Texto completo copiado', copyFailed: 'No se pudo copiar. Selecciona el texto y cópialo.'
+    copied: part => `Parte ${part} copiada`, copyFailed: 'No se pudo copiar. Selecciona el texto y cópialo.'
   } : {
-    answer: 'Answer', script: 'Script', copy: 'Copy full text',
+    answer: 'Answer', script: 'Script', part: 'Part', copy: 'Copy',
     empty: 'No entries match your search.',
     saved: 'Entry saved in this browser.', duplicate: 'This text is already in your library.',
     invalid: 'Choose a type and enter a title and body.',
     unavailable: 'Could not read the saved library. No changes will be made. Check browser storage and try again.',
     failed: 'Could not save the entry. Your draft is still here. Check available storage and try again.',
-    copied: 'Full text copied', copyFailed: 'Could not copy. Select the text and copy it.'
+    copied: part => `Part ${part} copied`, copyFailed: 'Could not copy. Select the text and copy it.'
   };
   const storageKey = 'pageantManualEntries';
   const included = [
@@ -65,6 +65,12 @@
       return true;
     });
   }
+  function entryBlocks(body) {
+    const paragraphBreak = /(?:\r\n|\n|\r(?!\n))(?:[^\S\r\n]*(?:\r\n|\n|\r(?!\n)))+/;
+    // Blank lines define paragraphs; a plain multiline list uses one block per line.
+    const separator = paragraphBreak.test(body) ? paragraphBreak : /\r\n|\r|\n/;
+    return body.split(separator).filter(block => block.trim());
+  }
   function render() {
     let stored = [];
     try { stored = readEntries(); }
@@ -89,25 +95,34 @@
       kind.textContent = labels[entry.type];
       const heading = document.createElement('h3');
       heading.textContent = entry.title;
-      const text = document.createElement('p');
+      const text = document.createElement('div');
       text.className = 'manual-entry-body';
-      text.textContent = entry.body;
-      const copy = document.createElement('button');
-      copy.type = 'button';
-      copy.className = 'bank-action';
-      copy.dataset.copyEntry = index;
-      copy.textContent = labels.copy;
-      copy.setAttribute('aria-label', `${labels.copy}: ${entry.title}`);
-      copy.addEventListener('click', async () => {
-        copy.disabled = true;
-        try {
-          // This library preserves authored text, including names and paragraphs.
-          await copyText(entry.body, true);
-          showToast(labels.copied);
-        } catch { status.textContent = labels.copyFailed; }
-        finally { copy.disabled = false; }
+      entryBlocks(entry.body).forEach((block, part) => {
+        const copy = document.createElement('button');
+        copy.type = 'button';
+        copy.className = 'phrase manual-entry-block';
+        copy.dataset.copyEntry = index;
+        copy.dataset.copyBlock = part;
+        copy.setAttribute('aria-label', `${labels.copy}: ${entry.title}, ${labels.part.toLowerCase()} ${part + 1}`);
+        const label = document.createElement('span');
+        label.className = 'speech-label';
+        label.textContent = `${labels.part} ${part + 1} · ${labels.copy}`;
+        const line = document.createElement('span');
+        line.className = 'speech-line';
+        line.textContent = block;
+        copy.append(label, line);
+        copy.addEventListener('click', async () => {
+          copy.disabled = true;
+          try {
+            // Copy the authored block, never its title or the button's label.
+            await copyText(block, true);
+            showToast(labels.copied(part + 1));
+          } catch { status.textContent = labels.copyFailed; }
+          finally { copy.disabled = false; }
+        });
+        text.append(copy);
       });
-      card.append(kind, heading, text, copy);
+      card.append(kind, heading, text);
       list.append(card);
     }
   }

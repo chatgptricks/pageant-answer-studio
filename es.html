@@ -478,7 +478,7 @@
 <link rel="apple-touch-icon" href="./icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="./app.css?v=7">
+<link rel="stylesheet" href="./app.css?v=8">
 </head>
 <body>
 <button class="timer" id="timer" hidden title="Reiniciar contador" aria-label="Reiniciar contador">100s ↻</button>
@@ -538,14 +538,15 @@
         <h2 id="manualLibraryHeading">Mi biblioteca</h2>
         <button class="bank-action" id="addManualEntry" type="button" aria-controls="manualEntryForm" aria-expanded="false">Agregar respuesta o script</button>
       </div>
-      <p class="bank-note">Se guarda en este navegador y dispositivo. Al copiar se conserva el texto exacto sin el título, incluidas sus mayúsculas y minúsculas originales.</p>
+      <p class="bank-note">Se guarda en este navegador y dispositivo. Pulsa cada bloque para copiar su texto sin el título y conservar sus mayúsculas y minúsculas originales.</p>
       <form id="manualEntryForm" class="manual-entry-form" hidden>
         <label for="manualEntryType">Tipo</label>
         <select id="manualEntryType" name="type"><option value="answer">Respuesta</option><option value="script">Script</option></select>
         <label for="manualEntryTitle">Título</label>
         <input id="manualEntryTitle" name="title" type="text" required>
         <label for="manualEntryBody">Texto</label>
-        <textarea id="manualEntryBody" name="body" rows="8" required></textarea>
+        <textarea id="manualEntryBody" name="body" rows="8" aria-describedby="manualEntryBodyHelp" required></textarea>
+        <p class="bank-note" id="manualEntryBodyHelp">Separa los párrafos con una línea en blanco; sin líneas en blanco, cada línea será un bloque.</p>
         <div class="manual-entry-actions">
           <button class="bank-action" id="saveManualEntry" type="submit">Guardar texto</button>
           <button class="bank-action" id="cancelManualEntry" type="button">Cancelar</button>
@@ -1290,8 +1291,8 @@ document.addEventListener('visibilitychange', () => { if (timerDeadline) updateT
 rankResults();
 renderResults();
 </script>
-<script src="./app.js?v=7"></script>
-<script src="./library.js?v=7"></script>
+<script src="./app.js?v=8"></script>
+<script src="./library.js?v=8"></script>
 </body>
 </html>
 
