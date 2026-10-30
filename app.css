@@ -47,3 +47,33 @@ body[data-view="questions"] #questionBank summary { display: none; }
 .toast { bottom: calc(92px + env(safe-area-inset-bottom)); }
 .install-button { margin-top: 16px; padding: 12px 18px; border-radius: 10px; border: 1px solid #32745e; color: #a5f2d3; background: #19362a; font: inherit; cursor: pointer; }
 @media(max-width: 480px) { .bottom-nav a { font-size: 11px; } .screen-title { font-size: 21px; } }
+
+body:not([data-view="library"]) #manualLibrary,
+body[data-view="library"] .content { display: none; }
+.manual-library { max-width: 808px; margin: 24px auto 48px; padding: 0 24px; }
+.manual-library-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.manual-library h2 { margin: 0; font-size: 23px; }
+.manual-library h3 { margin: 8px 0 16px; font-size: 20px; font-weight: 700; text-transform: none; letter-spacing: normal; overflow-wrap: anywhere; }
+.manual-library label { display: block; color: var(--muted); margin-bottom: 8px; font-size: 14px; }
+.manual-library input, .manual-library select, .manual-library textarea { min-width: 0; width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; font-size: 16px; }
+.manual-library textarea { resize: vertical; line-height: 1.6; }
+.manual-library :is(input, select, textarea, button):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.manual-entry-form { margin-top: 24px; padding: 20px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel); }
+.manual-entry-form > :is(input, select, textarea) { margin-bottom: 16px; }
+.manual-entry-actions, .manual-library-tools { display: flex; flex-wrap: wrap; gap: 12px; }
+.manual-library-tools { margin: 24px 0; }
+.manual-library-tools input { flex: 2 1 200px; }
+.manual-library-tools select { flex: 1 1 140px; }
+.manual-entry { padding: 20px; margin-bottom: 20px; }
+.manual-entry-kind { color: var(--muted); font-size: 13px; }
+.manual-entry-body { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; margin: 0 0 20px; }
+.manual-entry button { min-height: 48px; }
+.manual-library button { text-transform: none; }
+.manual-library button:disabled { opacity: .5; cursor: default; }
+.bottom-nav a[href="#library"][aria-current] { background: #203028; color: #a5f2d3; }
+@media(max-width: 480px) {
+  .manual-library { padding: 0 16px; }
+  .manual-entry, .manual-entry-form { padding: 16px; }
+  .manual-library-heading > button { width: 100%; }
+  .manual-entry-actions > button { flex: 1; }
+}

@@ -478,7 +478,7 @@
 <link rel="apple-touch-icon" href="./icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="./app.css?v=6">
+<link rel="stylesheet" href="./app.css?v=7">
 </head>
 <body>
 <button class="timer" id="timer" hidden title="Reiniciar contador" aria-label="Reiniciar contador">100s ↻</button>
@@ -507,7 +507,7 @@
           <input id="copyAllCaps" type="checkbox" checked style="width:20px;height:20px;accent-color:var(--accent)">
           Copiar en MAYÚSCULAS
         </label>
-        <p>Se aplica a todo lo que copies sin cambiar el texto en pantalla</p>
+        <p>Los textos de la biblioteca conservan sus mayúsculas y minúsculas originales; las demás herramientas de copiado usan este ajuste.</p>
         <button class="install-button" id="installApp" type="button" hidden>Instalar app</button>
         <p>En iPhone abre Safari y pulsa Compartir → Añadir a pantalla de inicio</p>
         <p id="offlineStatus" role="status">Preparando acceso sin conexión</p>
@@ -533,6 +533,31 @@
       <p class="bank-count" id="questionCount" aria-live="polite"></p>
       <div class="bank-list" id="questionList"></div>
     </details>
+    <section class="manual-library" id="manualLibrary" aria-labelledby="manualLibraryHeading">
+      <div class="manual-library-heading">
+        <h2 id="manualLibraryHeading">Mi biblioteca</h2>
+        <button class="bank-action" id="addManualEntry" type="button" aria-controls="manualEntryForm" aria-expanded="false">Agregar respuesta o script</button>
+      </div>
+      <p class="bank-note">Se guarda en este navegador y dispositivo. Al copiar se conserva el texto exacto sin el título, incluidas sus mayúsculas y minúsculas originales.</p>
+      <form id="manualEntryForm" class="manual-entry-form" hidden>
+        <label for="manualEntryType">Tipo</label>
+        <select id="manualEntryType" name="type"><option value="answer">Respuesta</option><option value="script">Script</option></select>
+        <label for="manualEntryTitle">Título</label>
+        <input id="manualEntryTitle" name="title" type="text" required>
+        <label for="manualEntryBody">Texto</label>
+        <textarea id="manualEntryBody" name="body" rows="8" required></textarea>
+        <div class="manual-entry-actions">
+          <button class="bank-action" id="saveManualEntry" type="submit">Guardar texto</button>
+          <button class="bank-action" id="cancelManualEntry" type="button">Cancelar</button>
+        </div>
+      </form>
+      <p class="bank-note" id="manualEntryStatus" role="status" aria-live="polite"></p>
+      <div class="manual-library-tools">
+        <input id="manualLibrarySearch" type="search" placeholder="Buscar textos guardados..." aria-label="Buscar en mi biblioteca">
+        <select id="manualLibraryType" aria-label="Filtrar por tipo"><option value="">Todos los tipos</option><option value="answer">Respuesta</option><option value="script">Script</option></select>
+      </div>
+      <div id="manualEntryList"></div>
+    </section>
     <section class="manual-text" aria-label="Texto manual">
       <label for="manualText">Escribe tu propio texto</label>
       <textarea id="manualText" placeholder="Escribe o pega lo que quieras copiar..." rows="4"></textarea>
@@ -548,6 +573,7 @@
   <a href="#questions"><span aria-hidden="true">?</span>Preguntas</a>
   <a href="#speech"><span aria-hidden="true">♛</span>Discurso</a>
   <a href="#outro"><span aria-hidden="true">☆</span>Cierre</a>
+  <a href="#library"><span aria-hidden="true">＋</span>Biblioteca</a>
 </nav>
 
 <script>
@@ -1064,8 +1090,8 @@ function renderResults() {
   });
 }
 
-async function copyText(text) {
-  text = state.copyAllCaps ? text.toUpperCase() : text;
+async function copyText(text, preserveCase = false) {
+  text = state.copyAllCaps && !preserveCase ? text.toUpperCase() : text;
   try {
     await navigator.clipboard.writeText(text);
     showToast("Oración copiada");
@@ -1264,7 +1290,8 @@ document.addEventListener('visibilitychange', () => { if (timerDeadline) updateT
 rankResults();
 renderResults();
 </script>
-<script src="./app.js?v=6"></script>
+<script src="./app.js?v=7"></script>
+<script src="./library.js?v=7"></script>
 </body>
 </html>
 
